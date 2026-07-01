@@ -18,13 +18,25 @@ const { chromium } = require('playwright');
     // 4. Loop through each category and attempt to vote
     for (const category of categories) {
         const entrySection = page.locator('div[id^="liminal-"]').filter({ hasText: category });
-        const voteButton = entrySection.getByRole('button', { name: 'Vote', exact: true });
+        // 5. Define both possible buttons
+        const voteButton = categoryBlock.getByRole('button', { name: 'Vote', exact: true });
+        const votedButton = categoryBlock.getByRole('button', { name: 'Voted', exact: true });
         
+        // 3. Check if the "Voted" button is already there
+        if (await votedButton.count() > 0) {
+            console.log(`Already voted for: ${category}. No action needed.`);
+            continue; // This tells the bot to skip to the next category
+        }
+
+        // 4. If not voted yet, check for the "Vote" button and click it
         if (await voteButton.count() > 0) {
             await voteButton.click({ force: true });
-            console.log(`Voted in category: ${category}`);
+            console.log(`Successfully voted in category: ${category}`);
+
+            // Add a tiny pause after clicking to let the site register the vote
+            await page.waitForTimeout(2000);
         } else {
-            console.log(`Could not find vote button for: ${category}`);
+            console.log(`Could not find any button for: ${category}`);
         }
     }
     
