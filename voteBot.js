@@ -21,7 +21,7 @@ const { chromium } = require('playwright');
         const voteButton = entrySection.getByRole('button', { name: 'Vote', exact: true });
         
         if (await voteButton.count() > 0) {
-            await voteButton.click();
+            await voteButton.click({ force: true });
             console.log(`Voted in category: ${category}`);
         } else {
             console.log(`Could not find vote button for: ${category}`);
