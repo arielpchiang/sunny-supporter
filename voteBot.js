@@ -12,23 +12,28 @@ const { chromium } = require('playwright');
     console.log('Navigating to the awards page...');
     await page.goto('https://refocus-awards.com/people-vote-award?q=Sunny%20Cheng');
 
+    // Wait 5 seconds for the dynamic content to load
+    await page.waitForTimeout(5000);
+
     // 3. Define the categories you want to vote for
     const categories = ['Abstract', 'Fine Art', 'Still Life'];
 
     // 4. Loop through each category and attempt to vote
     for (const category of categories) {
-        const entrySection = page.locator('div[id^="liminal-"]').filter({ hasText: category });
+        // Renamed entrySection back to categoryBlock to match the button logic
+        const categoryBlock = page.locator('div[id^="liminal-"]').filter({ hasText: category });
+        
         // 5. Define both possible buttons
         const voteButton = categoryBlock.getByRole('button', { name: 'Vote', exact: true });
         const votedButton = categoryBlock.getByRole('button', { name: 'Voted', exact: true });
         
-        // 3. Check if the "Voted" button is already there
+        // 6. Check if the "Voted" button is already there
         if (await votedButton.count() > 0) {
             console.log(`Already voted for: ${category}. No action needed.`);
             continue; // This tells the bot to skip to the next category
         }
 
-        // 4. If not voted yet, check for the "Vote" button and click it
+        // 7. If not voted yet, check for the "Vote" button and click it
         if (await voteButton.count() > 0) {
             await voteButton.click({ force: true });
             console.log(`Successfully voted in category: ${category}`);
@@ -40,7 +45,7 @@ const { chromium } = require('playwright');
         }
     }
     
-    // 5. Clean up and close
+    // 8. Clean up and close
     await browser.close();
     console.log('Finished execution.');
 })();
